@@ -33,3 +33,8 @@ jobs:
     - name: Building image
       run: |
         docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER" 
+
+    - name: Pushing to ECR
+      run: |
+        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$BUILD_NUMBER
+        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$BUILD_NUMBER
