@@ -1,0 +1,10 @@
+name: DVWA
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  
+  DVWA:
+    name: DVWA
+    runs-on: ubuntu-latest
