@@ -8,7 +8,7 @@ jobs:
   DVWA:
     name: DVWA
     runs-on: ubuntu-latest
-    environment: 
+    env: 
       IMAGE_REPO_NAME: "dvwapub"
       IMAGE_TAG: "std039"
       REPOSITORY_URI: "public.ecr.aws/f9n2h3p5/dvwapub"
