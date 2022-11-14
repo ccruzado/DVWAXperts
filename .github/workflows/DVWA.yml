@@ -42,4 +42,5 @@ jobs:
     - name: Deploy
       run: |
         sed -i "s/<TAG>/${IMAGE_TAG}-$BUILD_NUMBER/" deployment.yml
+        aws eks --region ${AWS_DEFAULT_REGION} update-kubeconfig --name eks-ccruzado
         kubectl apply -f deployment.yml
