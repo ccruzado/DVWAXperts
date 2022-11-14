@@ -32,4 +32,4 @@ jobs:
 
     - name: Building image
       run: |
-        docker build "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER" 
+        docker build . --file Dockerfile --tag ${IMAGE_TAG}-$BUILD_NUMBER" 
