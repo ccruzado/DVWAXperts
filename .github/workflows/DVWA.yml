@@ -24,3 +24,12 @@ jobs:
     - name: Logging into AWS ECR
       run: |
         aws ecr-public get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI} 
+
+    - name: Building image
+      run: |
+        docker build "${IMAGE_REPO_NAME}:${IMAGE_TAG}-${env.BUILD_NUMBER}" 
+
+    - name: Pushing to ECR
+      run: |
+        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-${env.BUILD_NUMBER} ${REPOSITORY_URI}:$IMAGE_TAG-${env.BUILD_NUMBER]
+        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-${env.BUILD_NUMBER}
