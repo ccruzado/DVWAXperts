@@ -11,7 +11,7 @@ jobs:
     env: 
       IMAGE_REPO_NAME: "dvwapub"
       IMAGE_TAG: "student"
-      REPOSITORY_URI: "public.ecr.aws/f9n2h3p5/dvwapub"
+      REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
       AWS_DEFAULT_REGION: "us-east-1"
       AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}          
@@ -38,3 +38,8 @@ jobs:
       run: |
         docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$BUILD_NUMBER
         docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$BUILD_NUMBER
+
+    - name: Deploy
+      run: |
+        sed -i "s/<TAG>/${IMAGE_TAG}-$BUILD_NUMBER/" deployment.yml
+        kubectl apply -f deployment.yml
