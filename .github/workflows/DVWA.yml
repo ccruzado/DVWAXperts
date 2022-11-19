@@ -33,6 +33,7 @@ jobs:
       run: |
         docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
         docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER
+        docker tag ${IMAGE_REPO_NAME}:latest ${REPOSITORY_URI}:latest
         docker push ${REPOSITORY_URI}:latest
 
   Terraform:
