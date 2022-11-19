@@ -28,11 +28,8 @@ jobs:
     - name: Building image
       run: |
         docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER"
-
-    - name: Building image latest
-      run: |
-        docker build . -t "${IMAGE_REPO_NAME}:latest
-
+        docker build . -t ${IMAGE_REPO_NAME}:latest
+    
     - name: Pushing to ECR
       run: |
         docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
