@@ -99,8 +99,8 @@ resource "aws_route_table_association" "rt-association-dvwa-pri-sn2" {
 
 # Security Group
 resource "aws_security_group" "sgr-dvwa-allow-all" {
-  name        = "Allow All dvwa"
-  description = "Allow all traffic"
+  name        = "sgr-dvwa-allow-all"
+  description = "sgr-dvwa-allow-all"
   vpc_id      = aws_vpc.dvwa-vpc.id
   ingress {
     from_port   = 0
@@ -120,8 +120,8 @@ resource "aws_security_group" "sgr-dvwa-allow-all" {
 }
 
 resource "aws_security_group" "sgr-dvwa-webserver" {
-  name        = "Allow All dvwa"
-  description = "Allow all traffic"
+  name        = "sgr-dvwa-webserver"
+  description = "sgr-dvwa-webserver"
   vpc_id      = aws_vpc.dvwa-vpc.id
   ingress {
     from_port   = 80
