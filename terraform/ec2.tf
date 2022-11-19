@@ -31,7 +31,7 @@ resource "aws_instance" "instance-dvwa" {
 }
 
 resource "aws_network_interface" "instance-dvwa" {
-  subnet_id   = aws_subnet.dvwa-vpc-priv1.id
+  subnet_id   = aws_subnet.dvwa-vpc-pub1.id
   private_ips = [cidrhost(var.dvwa-sn-cidr-pub1, 10)]
   security_groups = [aws_security_group.sgr-dvwa-webserver.id]
 
