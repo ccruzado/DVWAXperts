@@ -17,7 +17,7 @@ data "aws_ami" "amazon-linux-2" {
 }
 
 resource "aws_instance" "instance-dvwa" {
-  ami                    = data.amazon-linux-2.ubuntu.id
+  ami                    = data.aws_ami.amazon-linux-2.id
   instance_type          = var.size
   key_name               = var.keyname
   network_interface {
