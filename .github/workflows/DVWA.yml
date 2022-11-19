@@ -28,6 +28,7 @@ jobs:
     - name: Building image
       run: |
         docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER"
+        docker build . -t "${IMAGE_REPO_NAME}:latest
 
     - name: Pushing to ECR
       run: |
