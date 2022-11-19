@@ -25,22 +25,27 @@ jobs:
       run: |
         aws ecr-public get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI} 
 
-    - name: Generate build number
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{secrets.github_token}} 
-
     - name: Building image
       run: |
-        docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER" 
+        docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER" 
 
     - name: Pushing to ECR
       run: |
-        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$BUILD_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$BUILD_NUMBER
-        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$BUILD_NUMBER
+        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
+        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER
 
-    - name: Deploy
+    - name: Install Terraform
       run: |
-        sed -i "s/<TAG>/${IMAGE_TAG}-$BUILD_NUMBER/" deployment.yml
-        aws eks --region ${AWS_DEFAULT_REGION} update-kubeconfig --name eks-ccruzado
-        kubectl apply -f deployment.yml
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install terraform
+
+    - name: Terraform Init
+      run: |
+        cd terraform/
+        terraform init -backend-config backend.tfvars
+
+    - name: Terraform Plan
+      run: |
+        cd terraform/
+        terraform plan -var-file terraform.tfvars -out terraform.tfplan
