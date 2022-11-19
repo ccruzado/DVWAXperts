@@ -12,9 +12,7 @@ jobs:
       IMAGE_REPO_NAME: "dvwapub"
       IMAGE_TAG: "student"
       REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
-      AWS_DEFAULT_REGION: "us-east-1"
-      AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}          
+      AWS_DEFAULT_REGION: "us-east-1"       
 
     steps:
 
@@ -33,6 +31,17 @@ jobs:
       run: |
         docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
         docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER
+        docker push ${REPOSITORY_URI}:latest
+
+  Terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    env: 
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}          
+
+    steps:
 
     - name: Install Terraform
       run: |
@@ -49,3 +58,8 @@ jobs:
       run: |
         cd terraform/
         terraform plan -var-file terraform.tfvars -out terraform.tfplan
+
+    - name: Terraform Apply
+      run: |
+        cd terraform/
+        terraform apply terraform.tfplan
