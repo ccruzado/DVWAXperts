@@ -1,0 +1,68 @@
+name: DVWA
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  
+  DVWA:
+    name: DVWA
+    runs-on: ubuntu-latest
+    env: 
+      IMAGE_REPO_NAME: "dvwapub"
+      IMAGE_TAG: "student"
+      REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Logging into AWS ECR
+      run: |
+        aws ecr-public get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}
+
+    - name: Building image
+      run: |
+        docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER"
+        docker build . -t ${IMAGE_REPO_NAME}:latest
+    
+    - name: Pushing to ECR
+      run: |
+        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
+        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER
+        docker tag ${IMAGE_REPO_NAME}:latest ${REPOSITORY_URI}:latest
+        docker push ${REPOSITORY_URI}:latest
+
+  Terraform:
+    name: Terraform
+    runs-on: ubuntu-latest
+    needs: [DVWA]
+    env: 
+      AWS_DEFAULT_REGION: "us-east-1"
+      AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
+      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+    steps:
+
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+      
+    - name: Install Terraform
+      run: |
+        curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+        sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+        sudo apt-get update && sudo apt-get install terraform
+
+    - name: Terraform Init
+      run: |
+        cd terraform/
+        terraform init -backend-config backend.tfvars
+
+    - name: Terraform Plan
+      run: |
+        cd terraform/
+        terraform plan -var-file terraform.tfvars -out terraform.tfplan
