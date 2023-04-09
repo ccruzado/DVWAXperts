@@ -1,4 +1,4 @@
-name: DVWA
+name: DVWA 03 destroy
 
 on: 
   workflow_dispatch:

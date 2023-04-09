@@ -1,4 +1,4 @@
-name: DVWA
+name: DVWA 01 plan
 
 on: 
   workflow_dispatch:
