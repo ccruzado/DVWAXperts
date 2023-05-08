@@ -22,8 +22,8 @@ module "ecs_service" {
   name        = "ecs-service-dvwa"
   cluster_arn = module.ecs_cluster.cluster_arn
 
-  cpu    = 1024
-  memory = 4096
+  cpu    = 512
+  memory = 1024
 
   # Container definition(s)
   container_definitions = {
@@ -31,7 +31,7 @@ module "ecs_service" {
       cpu       = 512
       memory    = 1024
       essential = true
-      image     = "vulnerables/web-dvwa"
+      image     = "nginxdemos/hello"
       port_mappings = [
         {
           name          = "dvwa"
