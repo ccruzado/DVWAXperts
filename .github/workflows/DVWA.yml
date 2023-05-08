@@ -1,4 +1,4 @@
-name: DVWA 02 apply
+name: DVWA
 
 on: 
   workflow_dispatch:
