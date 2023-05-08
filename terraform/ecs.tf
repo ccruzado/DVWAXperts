@@ -31,7 +31,7 @@ module "ecs_service" {
       cpu       = 512
       memory    = 1024
       essential = true
-      image     = "nginxdemos/hello"
+      image     = "vulnerables/web-dvwa"
       port_mappings = [
         {
           name          = "dvwa"
