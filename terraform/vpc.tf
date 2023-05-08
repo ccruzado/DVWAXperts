@@ -55,6 +55,18 @@ resource "aws_internet_gateway" "igw-dvwa" {
     Name = "igw-dvwa"
   }
 }
+# NAT Gateway
+resource "aws_eip" "eip-ngw" {
+  vpc = true
+}
+resource "aws_nat_gateway" "ngw" {
+  allocation_id = aws_eip.eip-ngw.id
+  subnet_id     = aws_subnet.dvwa-vpc-pub1.id
+  tags = {
+    Name = "ngw-dvwa"
+  }
+  depends_on = [aws_internet_gateway.igw-dvwa]
+}
 
 # Routes
 resource "aws_route_table" "rt-dvwa-pub" {
@@ -70,6 +82,10 @@ resource "aws_route_table" "rt-dvwa-pub" {
 
 resource "aws_route_table" "rt-dvwa-pri" {
   vpc_id = aws_vpc.dvwa-vpc.id
+  route {
+    cidr_block      = "0.0.0.0/0"
+    nat_gateway_id  = aws_nat_gateway.ngw.id
+  }
   tags = {
     Name     = "rt-dvwa-pri"
   }
