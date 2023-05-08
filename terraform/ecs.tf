@@ -20,7 +20,7 @@ module "ecs_cluster" {
 module "ecs_service" {
   source      = "terraform-aws-modules/ecs/aws//modules/service"
   name        = "ecs-service-dvwa"
-  cluster_arn = module.ecs_cluster.arn
+  cluster_arn = module.ecs_cluster.cluster_arn
 
   cpu    = 1024
   memory = 4096
