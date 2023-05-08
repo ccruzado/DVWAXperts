@@ -40,6 +40,7 @@ module "ecs_service" {
           protocol      = "tcp"
         }
       ]
+      readonly_root_filesystem = false
     }
   }
   load_balancer = {
