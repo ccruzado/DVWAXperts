@@ -11,7 +11,7 @@ jobs:
     env: 
       IMAGE_REPO_NAME: "dvwa"
       IMAGE_TAG: "app"
-      REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
+      REPOSITORY_URI: "984954827291.dkr.ecr.us-east-1.amazonaws.com/dvwa"
       AWS_DEFAULT_REGION: "us-east-1"
       AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
       AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
