@@ -9,7 +9,7 @@ jobs:
     name: DVWA
     runs-on: ubuntu-latest
     env: 
-      IMAGE_REPO_NAME: "dvwapub"
+      IMAGE_REPO_NAME: "dvwa"
       IMAGE_TAG: "app"
       REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
       AWS_DEFAULT_REGION: "us-east-1"
