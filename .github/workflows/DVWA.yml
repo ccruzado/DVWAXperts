@@ -8,19 +8,13 @@ jobs:
   DVWA:
     name: DVWA
     runs-on: ubuntu-latest
-    env: 
-      IMAGE_REPO_NAME: "dvwapub"
-      IMAGE_TAG: "app"
-      REPOSITORY_URI: "public.ecr.aws/o9e7c4k1/dvwapub"
-      AWS_DEFAULT_REGION: "us-east-1"
-      AWS_ACCESS_KEY_ID:  ${{secrets.AWS_ACCESS_KEY_ID}}
-      AWS_SECRET_ACCESS_KEY:  ${{secrets.AWS_SECRET_ACCESS_KEY}}
 
     steps:
 
     - name: Checkout Repo
       uses: actions/checkout@v3
 
+<<<<<<< HEAD
     - name: SAST
       run: |
         env | grep -E "GITHUB_ACTIONS|GITHUB_RUN_NUMBER|GITHUB_REF_NAME|GITHUB_SHA" > /tmp/env
@@ -30,15 +24,46 @@ jobs:
     - name: Logging into AWS ECR
       run: |
         aws ecr-public get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${REPOSITORY_URI}
+=======
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-    - name: Building image
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+>>>>>>> a278962e839658aa525ad32f83013f4049f1218f
+
+    - name: Build, tag, and push image to Amazon ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: dvwa
+        IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build . -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER"
-        docker build . -t ${IMAGE_REPO_NAME}:latest
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
     
-    - name: Pushing to ECR
+    - name: Download task definition
       run: |
-        docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER ${REPOSITORY_URI}:$IMAGE_TAG-$GITHUB_RUN_NUMBER
-        docker push ${REPOSITORY_URI}:${IMAGE_TAG}-$GITHUB_RUN_NUMBER
-        docker tag ${IMAGE_REPO_NAME}:latest ${REPOSITORY_URI}:latest
-        docker push ${REPOSITORY_URI}:latest
+        aws ecs describe-task-definition --task-definition ecs-service-dvwa --query taskDefinition > task-definition.json
+
+    - name: Fill in the new image ID in the Amazon ECS task definition
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: dvwa
+        image: ${{ steps.build-image.outputs.image }}
+
+    - name: Deploy Amazon ECS task definition
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        service: ecs-service-dvwa
+        cluster: ecs-fargate-dvwa
+        wait-for-service-stability: true
