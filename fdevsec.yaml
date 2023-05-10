@@ -3,3 +3,10 @@ version: v1
 id:
   org: 5f5dcbb1-567c-4262-9ff6-dfade0da137e
   app: fc30ded2-a1b9-4963-bb04-a93daa2ce166
+
+scanners:
+  - sast
+  - secret
+  - sca
+  - iac
+  - container   
